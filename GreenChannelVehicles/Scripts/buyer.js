@@ -51,17 +51,6 @@
             ok = false;
         }
 
-        var withoutVal = $('input[name="withoutPCS"]:checked').val();
-        if (!withoutVal) {
-            $('#fieldWithoutPCS').addClass('has-error');
-            ok = false;
-        }
-
-        if (withoutVal === 'no' && !$('input[name="manualPCS"]:checked').val()) {
-            $('#fieldManualPCS').addClass('has-error');
-            ok = false;
-        }
-
         var material = $material.val().trim();
         if (material.length < 1 || material.length > 50 || UNSAFE_RE.test(material)) {
             $('#fieldMaterial').addClass('has-error');
@@ -72,8 +61,10 @@
     }
 
     function collectPayload() {
-        var withoutVal = $('input[name="withoutPCS"]:checked').val() === 'yes';
-        var manualVal = withoutVal ? null : ($('input[name="manualPCS"]:checked').val() === 'yes');
+        var withoutValRaw = $('input[name="withoutPCS"]:checked').val();
+        var withoutVal = withoutValRaw ? withoutValRaw === 'yes' : null;
+        var manualValRaw = $('input[name="manualPCS"]:checked').val();
+        var manualVal = withoutVal === true ? null : (manualValRaw ? manualValRaw === 'yes' : null);
         return {
             vehicleNo: $('#vehicleNo').val().trim(),
             transporter: $('#transporter').val().trim(),
@@ -131,14 +122,18 @@
         $errorBanner[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
+    function pcsLabel(v) {
+        return v === true ? 'Yes' : v === false ? 'No' : 'Not specified';
+    }
+
     function showSuccess(data) {
         var $receipt = $('#receipt');
         $receipt.empty();
         var rows = [
             ['Vehicle number', data.vehicleNo],
             ['Transporter', data.transporter],
-            ['Without PCS', data.withoutPCS ? 'Yes' : 'No'],
-            ['Manual PCS', data.withoutPCS ? 'N/A' : (data.manualPCS ? 'Yes' : 'No')],
+            ['Without PCS', pcsLabel(data.withoutPCS)],
+            ['Manual PCS', data.withoutPCS === true ? 'N/A' : pcsLabel(data.manualPCS)],
             ['Material', data.material],
             ['Submitted', data.submittedAt]
         ];

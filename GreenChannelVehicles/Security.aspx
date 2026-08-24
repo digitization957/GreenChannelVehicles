@@ -29,7 +29,11 @@
                 <div class="stat-chip"><span class="live-dot" aria-hidden="true"></span>&nbsp;<span>Live</span></div>
                 <div class="stat-chip"><strong id="pendingCount">0</strong><span>Pending</span></div>
                 <div class="stat-chip"><strong id="insideCount">0</strong><span>Inside</span></div>
-                <button type="button" class="btn btn-secondary" id="refreshBtn">Refresh</button>
+                <div class="search-box" id="searchBox">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="searchInput" placeholder="Search vehicle, transporter, material" aria-label="Search vehicles" autocomplete="off" />
+                    <button type="button" class="clear-btn" id="clearSearch" aria-label="Clear search">&times;</button>
+                </div>
             </div>
         </div>
 
@@ -38,16 +42,18 @@
         <div id="cardGrid" class="card-grid" aria-live="polite"></div>
 
         <div id="emptyState" class="empty-state" style="display:none;">
-            <div class="display">No vehicles yet</div>
-            <p>Entries submitted by buyers will show up here automatically.</p>
+            <div class="display" id="emptyTitle">No vehicles yet</div>
+            <p id="emptyBody">Entries submitted by buyers will show up here automatically.</p>
         </div>
     </main>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
 
     <script id="cardTemplate" type="text/x-template">
         <article class="v-card" data-id="">
             <div class="v-card__head">
                 <div class="v-card__plate"></div>
-                <span class="badge"></span>
+                <span class="v-card__status"></span>
             </div>
             <div class="v-card__rows">
                 <div class="v-card__row"><span class="k">Transporter</span><span class="v" data-f="transporter"></span></div>
@@ -56,7 +62,7 @@
             </div>
             <div class="v-card__material" data-f="material"></div>
             <div class="v-card__meta" data-f="meta"></div>
-            <button type="button" class="btn btn-primary btn-block" data-action="inside">Vehicle is inside gate</button>
+            <button type="button" class="btn btn-primary btn-block" data-action="inside">Mark inside gate</button>
         </article>
     </script>
 

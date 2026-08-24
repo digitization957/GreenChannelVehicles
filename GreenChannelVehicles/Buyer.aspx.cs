@@ -9,7 +9,7 @@ namespace GreenChannelVehicles
         protected void Page_Load(object sender, EventArgs e) { }
 
         [WebMethod(EnableSession = false)]
-        public static object SubmitVehicle(string vehicleNo, string transporter, bool withoutPCS, bool? manualPCS, string material)
+        public static object SubmitVehicle(string vehicleNo, string transporter, bool? withoutPCS, bool? manualPCS, string material)
         {
             try
             {
