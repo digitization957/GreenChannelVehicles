@@ -1,0 +1,56 @@
+name: Build Kiosk
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "kiosk/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        working-directory: kiosk
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install pyinstaller
+
+      - name: Build exe
+        working-directory: kiosk
+        run: |
+          python -m PyInstaller `
+            --name GateWatch `
+            --windowed `
+            --noconfirm `
+            --add-data "ui;ui" `
+            --collect-all mysql.connector `
+            app.py
+
+      - name: Zip build output
+        working-directory: kiosk/dist
+        run: Compress-Archive -Path GateWatch -DestinationPath GateWatch-windows.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GateWatch-windows
+          path: kiosk/dist/GateWatch-windows.zip
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: kiosk-v${{ github.run_number }}
+          name: GateWatch Kiosk build ${{ github.run_number }}
+          files: kiosk/dist/GateWatch-windows.zip
+          make_latest: true
