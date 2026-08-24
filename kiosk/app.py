@@ -1,14 +1,21 @@
+import asyncio
 import http.server
 import pathlib
 import socketserver
-import subprocess
 import sys
 import threading
 
 import webview
 
-BASE_DIR = pathlib.Path(__file__).parent
-UI_DIR = BASE_DIR / "ui"
+import server
+
+
+def resource_path(*parts):
+    base = pathlib.Path(getattr(sys, "_MEIPASS", pathlib.Path(__file__).parent))
+    return base.joinpath(*parts)
+
+
+UI_DIR = resource_path("ui")
 HTTP_PORT = 8766
 
 
@@ -26,11 +33,15 @@ def serve_ui():
         httpd.serve_forever()
 
 
+def serve_ws():
+    asyncio.run(server.main())
+
+
 def main():
     threading.Thread(target=serve_ui, daemon=True).start()
-    ws_process = subprocess.Popen([sys.executable, str(BASE_DIR / "server.py")])
+    threading.Thread(target=serve_ws, daemon=True).start()
 
-    window = webview.create_window(
+    webview.create_window(
         "Gate Watch",
         f"http://127.0.0.1:{HTTP_PORT}/index.html",
         fullscreen=True,
@@ -38,7 +49,6 @@ def main():
         resizable=False,
         confirm_close=False,
     )
-    window.events.closed += lambda: ws_process.terminate()
 
     webview.start(debug=False)
 

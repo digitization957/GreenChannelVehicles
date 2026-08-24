@@ -5,16 +5,18 @@ import os
 import mysql.connector
 import websockets
 
-DB_HOST = os.environ.get("GCV_DB_HOST", "mazpngpappmysql01.mysql.database.azure.com")
-DB_NAME = os.environ.get("GCV_DB_NAME", "gcv_db")
-DB_USER = os.environ.get("GCV_DB_USER", "ngpdbadm")
-DB_PASSWORD = os.environ.get("GCV_DB_PASSWORD")
+import config
+
+DB_HOST = os.environ.get("GCV_DB_HOST", config.DB_HOST)
+DB_NAME = os.environ.get("GCV_DB_NAME", config.DB_NAME)
+DB_USER = os.environ.get("GCV_DB_USER", config.DB_USER)
+DB_PASSWORD = os.environ.get("GCV_DB_PASSWORD", config.DB_PASSWORD)
 WS_HOST = "127.0.0.1"
-WS_PORT = int(os.environ.get("GCV_KIOSK_WS_PORT", "8765"))
+WS_PORT = int(os.environ.get("GCV_KIOSK_WS_PORT", config.KIOSK_WS_PORT))
 POLL_SECONDS = 3
 
-if not DB_PASSWORD:
-    raise SystemExit("GCV_DB_PASSWORD environment variable is required.")
+if not DB_PASSWORD or DB_PASSWORD == "REPLACE_ME":
+    raise SystemExit("kiosk/config.py has no DB_PASSWORD set. Copy config.example.py to config.py and fill it in.")
 
 clients = set()
 last_payload = None
