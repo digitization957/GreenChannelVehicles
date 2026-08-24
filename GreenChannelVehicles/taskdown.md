@@ -12,3 +12,5 @@
 - Added a search box (top-right of Security toolbar) filtering by vehicle no / transporter / material, with match highlighting and a dedicated "no matches" empty state.
 - Buyer form: Vehicle no / Transporter / Material are the only mandatory fields (marked with *); Without PCS / Manual PCS are now optional and shown side by side in a two-column row.
 - Backend (VehicleGateStore, Buyer.aspx.cs) updated: WithoutPCS is now nullable and no longer enforced server-side, matching the relaxed validation.
+- Added App_Data/schema.sql: MySQL schema (gcv_db.vehicle_entries table matching VehicleEntry fields) + least-privilege app user. Not wired into the app yet — DB access wasn't available in this environment, app still runs on the in-memory VehicleGateStore.
+- Built the app (no Visual Studio/MSBuild web targets installed) and ran it via IIS Express on http://localhost:8080 — Default/Buyer/Security all return 200.
