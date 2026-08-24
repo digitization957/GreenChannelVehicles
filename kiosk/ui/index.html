@@ -44,8 +44,7 @@
     border-bottom: 2px solid var(--red);
     flex-shrink: 0;
   }
-  .bd-logo { display: flex; align-items: center; flex-shrink: 0; }
-  .bd-logo img { height: clamp(16px, 2.6vw, 30px); display: block; }
+  img.bd-logo { height: clamp(16px, 2.6vw, 30px); width: auto; display: block; flex-shrink: 0; }
   .bd-logo-placeholder {
     display: flex;
     align-items: center;
@@ -134,10 +133,17 @@
     background: var(--red);
     color: white;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     padding: 0.35% 2.2%;
   }
+  .bd-foot-count {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: clamp(0.55rem, 1vw, 0.78rem);
+    letter-spacing: 0.02em;
+  }
+  .bd-foot-count strong { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
   .bd-foot-time { display: flex; align-items: baseline; gap: 0.6em; }
   .bd-foot-clock { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: clamp(0.6rem, 1.25vw, 0.9rem); font-variant-numeric: tabular-nums; }
   .bd-foot-date { font-size: clamp(0.5rem, 0.9vw, 0.68rem); opacity: 0.85; }
@@ -185,6 +191,7 @@
     <div class="bd-empty" id="emptyState" style="display:none;">No vehicles pending</div>
 
     <div class="bd-foot">
+      <div class="bd-foot-count"><strong id="pendingCount">0</strong> pending</div>
       <div class="bd-foot-time">
         <div class="bd-foot-clock" data-clock>00:00:00</div>
         <div class="bd-foot-date" data-date></div>
@@ -207,6 +214,7 @@
       var $rows = document.getElementById('rows');
       var $empty = document.getElementById('emptyState');
       var $error = document.getElementById('errorBanner');
+      var $pendingCount = document.getElementById('pendingCount');
       var $gcLogoImg = document.getElementById('gcLogoImg');
       var $gcLogoFallback = document.getElementById('gcLogoFallback');
       var template = document.getElementById('rowTemplate').innerHTML;
@@ -229,6 +237,7 @@
 
       function render(vehicles) {
         $rows.innerHTML = '';
+        $pendingCount.textContent = vehicles.length;
         if (!vehicles.length) {
           $empty.style.display = '';
           return;

@@ -28,7 +28,8 @@ def fetch_pending():
         cur = conn.cursor(dictionary=True)
         cur.execute(
             "SELECT id, vehicle_no, transporter, material FROM vehicle_entries "
-            "WHERE is_inside = 0 ORDER BY submitted_at DESC"
+            "WHERE is_inside = 0 AND DATE(submitted_at) = CURDATE() "
+            "ORDER BY submitted_at DESC"
         )
         rows = cur.fetchall()
         cur.close()

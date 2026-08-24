@@ -14,6 +14,8 @@ HTTP_PORT = 8766
 
 def serve_ui():
     class Handler(http.server.SimpleHTTPRequestHandler):
+        extensions_map = {**http.server.SimpleHTTPRequestHandler.extensions_map, ".webp": "image/webp"}
+
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=str(UI_DIR), **kwargs)
 
