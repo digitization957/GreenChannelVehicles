@@ -227,6 +227,7 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="VehicleGateStore.cs" />
+    <Compile Include="PlantMasterStore.cs" />
     <Compile Include="Buyer.aspx.cs">
       <DependentUpon>Buyer.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

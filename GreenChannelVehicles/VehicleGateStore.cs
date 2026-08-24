@@ -16,6 +16,7 @@ namespace GreenChannelVehicles
         public bool? WithoutPCS { get; set; }
         public bool? ManualPCS { get; set; }
         public string Material { get; set; }
+        public int PgId { get; set; }
         public DateTime SubmittedAt { get; set; }
         public bool IsInside { get; set; }
         public DateTime? InsideAt { get; set; }
@@ -39,7 +40,7 @@ namespace GreenChannelVehicles
             return conn;
         }
 
-        public static VehicleEntry Add(string vehicleNo, string transporter, string buyerName, string token, bool? withoutPCS, bool? manualPCS, string material)
+        public static VehicleEntry Add(string vehicleNo, string transporter, string buyerName, string token, bool? withoutPCS, bool? manualPCS, string material, int pgId)
         {
             vehicleNo = (vehicleNo ?? string.Empty).Trim().ToUpperInvariant();
             transporter = (transporter ?? string.Empty).Trim();
@@ -59,12 +60,14 @@ namespace GreenChannelVehicles
             if (!TokenPattern.IsMatch(token))
                 throw new ArgumentException("Enter a valid token (3-20 letters/digits).");
 
-            if (material.Length < 1 || material.Length > 50 || UnsafeCharsPattern.IsMatch(material))
-                throw new ArgumentException("Material details must be 1-50 characters with no special symbols.");
+            if (material.Length > 50 || UnsafeCharsPattern.IsMatch(material))
+                throw new ArgumentException("Material details must be up to 50 characters with no special symbols.");
+
+            if (pgId <= 0)
+                throw new ArgumentException("Select a PG.");
 
             var entry = new VehicleEntry
             {
-                Id = Guid.NewGuid().ToString("N"),
                 VehicleNo = vehicleNo,
                 Transporter = transporter,
                 BuyerName = buyerName,
@@ -72,6 +75,7 @@ namespace GreenChannelVehicles
                 WithoutPCS = withoutPCS,
                 ManualPCS = withoutPCS == true ? (bool?)null : manualPCS,
                 Material = material,
+                PgId = pgId,
                 SubmittedAt = DateTime.Now,
                 IsInside = false,
                 InsideAt = null
@@ -80,11 +84,10 @@ namespace GreenChannelVehicles
             using (var conn = OpenConnection())
             using (var cmd = new MySqlCommand(
                 @"INSERT INTO vehicle_entries
-                    (id, vehicle_no, transporter, buyer_name, token, without_pcs, manual_pcs, material, submitted_at, is_inside, inside_at)
+                    (vehicle_no, transporter, buyer_name, token, without_pcs, manual_pcs, material, pg_id, submitted_at, is_inside, inside_at)
                   VALUES
-                    (@id, @vehicleNo, @transporter, @buyerName, @token, @withoutPCS, @manualPCS, @material, @submittedAt, 0, NULL)", conn))
+                    (@vehicleNo, @transporter, @buyerName, @token, @withoutPCS, @manualPCS, @material, @pgId, @submittedAt, 0, NULL)", conn))
             {
-                cmd.Parameters.AddWithValue("@id", entry.Id);
                 cmd.Parameters.AddWithValue("@vehicleNo", entry.VehicleNo);
                 cmd.Parameters.AddWithValue("@transporter", entry.Transporter);
                 cmd.Parameters.AddWithValue("@buyerName", entry.BuyerName);
@@ -92,8 +95,10 @@ namespace GreenChannelVehicles
                 cmd.Parameters.AddWithValue("@withoutPCS", (object)entry.WithoutPCS ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@manualPCS", (object)entry.ManualPCS ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@material", entry.Material);
+                cmd.Parameters.AddWithValue("@pgId", entry.PgId);
                 cmd.Parameters.AddWithValue("@submittedAt", entry.SubmittedAt);
                 cmd.ExecuteNonQuery();
+                entry.Id = cmd.LastInsertedId.ToString();
             }
 
             return entry;
@@ -101,7 +106,8 @@ namespace GreenChannelVehicles
 
         public static VehicleEntry MarkInside(string id)
         {
-            if (string.IsNullOrEmpty(id))
+            int entryId;
+            if (!int.TryParse(id, out entryId))
                 throw new ArgumentException("Vehicle entry not found.");
 
             var insideAt = DateTime.Now;
@@ -112,13 +118,13 @@ namespace GreenChannelVehicles
                     "UPDATE vehicle_entries SET is_inside = 1, inside_at = @insideAt WHERE id = @id AND is_inside = 0", conn))
                 {
                     cmd.Parameters.AddWithValue("@insideAt", insideAt);
-                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@id", entryId);
                     cmd.ExecuteNonQuery();
                 }
 
                 using (var cmd = new MySqlCommand("SELECT * FROM vehicle_entries WHERE id = @id", conn))
                 {
-                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@id", entryId);
                     using (var reader = cmd.ExecuteReader())
                     {
                         if (!reader.Read())
@@ -135,7 +141,7 @@ namespace GreenChannelVehicles
 
             using (var conn = OpenConnection())
             using (var cmd = new MySqlCommand(
-                "SELECT * FROM vehicle_entries ORDER BY is_inside ASC, submitted_at DESC", conn))
+                "SELECT * FROM vehicle_entries WHERE DATE(submitted_at) = CURDATE() ORDER BY is_inside ASC, submitted_at DESC", conn))
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
@@ -157,6 +163,7 @@ namespace GreenChannelVehicles
                 WithoutPCS = reader["without_pcs"] == DBNull.Value ? (bool?)null : Convert.ToBoolean(reader["without_pcs"]),
                 ManualPCS = reader["manual_pcs"] == DBNull.Value ? (bool?)null : Convert.ToBoolean(reader["manual_pcs"]),
                 Material = reader["material"].ToString(),
+                PgId = Convert.ToInt32(reader["pg_id"]),
                 SubmittedAt = Convert.ToDateTime(reader["submitted_at"]),
                 IsInside = Convert.ToBoolean(reader["is_inside"]),
                 InsideAt = reader["inside_at"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["inside_at"])

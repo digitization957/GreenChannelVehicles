@@ -11,8 +11,22 @@
     var $manualGroup = $('#manualPCSGroup');
     var $manualField = $('#fieldManualPCS');
     var $material = $('#material');
+    var $pg = $('#pg');
     var $submitBtn = $('#submitBtn');
     var $errorBanner = $('#errorBanner');
+
+    $.ajax({
+        url: 'Buyer.aspx/GetPGList',
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json'
+    }).done(function (res) {
+        var data = res.d;
+        if (!data || !data.success) return;
+        (data.items || []).forEach(function (item) {
+            $pg.append($('<option>').val(item.id).text(item.name));
+        });
+    });
 
     function updateManualPCSState() {
         var withoutVal = $('input[name="withoutPCS"]:checked').val();
@@ -65,8 +79,13 @@
             ok = false;
         }
 
+        if (!$pg.val()) {
+            $('#fieldPg').addClass('has-error');
+            ok = false;
+        }
+
         var material = $material.val().trim();
-        if (material.length < 1 || material.length > 50 || UNSAFE_RE.test(material)) {
+        if (material.length > 50 || UNSAFE_RE.test(material)) {
             $('#fieldMaterial').addClass('has-error');
             ok = false;
         }
@@ -86,7 +105,8 @@
             token: $('#token').val().trim(),
             withoutPCS: withoutVal,
             manualPCS: manualVal,
-            material: $material.val().trim()
+            material: $material.val().trim(),
+            pgId: parseInt($pg.val(), 10)
         };
     }
 
@@ -111,6 +131,7 @@
 
     function submitEntry() {
         var payload = collectPayload();
+        var pgName = $pg.find('option:selected').text();
         $submitBtn.addClass('is-loading').prop('disabled', true);
 
         $.ajax({
@@ -122,6 +143,7 @@
         }).done(function (res) {
             var data = res.d;
             if (data && data.success) {
+                data.pgName = pgName;
                 showSuccess(data);
             } else {
                 showError((data && data.message) || 'Could not submit entry.');
@@ -150,9 +172,10 @@
             ['Transporter', data.transporter],
             ['Buyer name', data.buyerName],
             ['Token', data.token],
+            ['PG', data.pgName],
             ['Without PCS', pcsLabel(data.withoutPCS)],
             ['Manual PCS', data.withoutPCS === true ? 'N/A' : pcsLabel(data.manualPCS)],
-            ['Material', data.material],
+            ['Material', data.material || 'Not specified'],
             ['Submitted', data.submittedAt]
         ];
         rows.forEach(function (r) {

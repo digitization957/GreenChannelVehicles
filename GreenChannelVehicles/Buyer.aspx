@@ -44,6 +44,14 @@
                             <p class="error-msg">Enter a valid token (3-20 letters/digits).</p>
                         </div>
                     </div>
+
+                    <div class="field" id="fieldPg">
+                        <label for="pg">PG<span class="req-mark">*</span></label>
+                        <select id="pg" required aria-required="true">
+                            <option value="">Select PG</option>
+                        </select>
+                        <p class="error-msg">Select a PG.</p>
+                    </div>
                 </div>
 
                 <div class="form-section">
@@ -96,10 +104,10 @@
                     </div>
 
                     <div class="field" id="fieldMaterial">
-                        <label for="material">Material details<span class="req-mark">*</span></label>
-                        <input type="text" id="material" maxlength="50" autocomplete="off" placeholder="What is the vehicle carrying?" required aria-required="true" />
+                        <label for="material">Material details</label>
+                        <input type="text" id="material" maxlength="50" autocomplete="off" placeholder="What is the vehicle carrying? (optional)" />
                         <div class="char-count"><span id="materialCount">0</span>/50</div>
-                        <p class="error-msg">Enter material details (up to 50 characters).</p>
+                        <p class="error-msg">Material details must be up to 50 characters with no special symbols.</p>
                     </div>
                 </div>
 
