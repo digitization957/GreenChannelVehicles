@@ -9,17 +9,19 @@ namespace GreenChannelVehicles
         protected void Page_Load(object sender, EventArgs e) { }
 
         [WebMethod(EnableSession = false)]
-        public static object SubmitVehicle(string vehicleNo, string transporter, bool? withoutPCS, bool? manualPCS, string material)
+        public static object SubmitVehicle(string vehicleNo, string transporter, string buyerName, string token, bool? withoutPCS, bool? manualPCS, string material)
         {
             try
             {
-                var entry = VehicleGateStore.Add(vehicleNo, transporter, withoutPCS, manualPCS, material);
+                var entry = VehicleGateStore.Add(vehicleNo, transporter, buyerName, token, withoutPCS, manualPCS, material);
                 return new
                 {
                     success = true,
                     id = entry.Id,
                     vehicleNo = entry.VehicleNo,
                     transporter = entry.Transporter,
+                    buyerName = entry.BuyerName,
+                    token = entry.Token,
                     withoutPCS = entry.WithoutPCS,
                     manualPCS = entry.ManualPCS,
                     material = entry.Material,

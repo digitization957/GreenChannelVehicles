@@ -18,6 +18,8 @@ namespace GreenChannelVehicles
                 id = e.Id,
                 vehicleNo = e.VehicleNo,
                 transporter = e.Transporter,
+                buyerName = e.BuyerName,
+                token = e.Token,
                 withoutPCS = e.WithoutPCS,
                 manualPCS = e.ManualPCS,
                 material = e.Material,

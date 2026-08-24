@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS vehicle_entries (
   id            CHAR(32)      NOT NULL PRIMARY KEY,   -- Guid.NewGuid("N")
   vehicle_no    VARCHAR(15)   NOT NULL,
   transporter   VARCHAR(60)   NOT NULL,
+  buyer_name    VARCHAR(60)   NOT NULL,
+  token         VARCHAR(20)   NOT NULL,
   without_pcs   TINYINT(1)    NULL,
   manual_pcs    TINYINT(1)    NULL,
   material      VARCHAR(50)   NOT NULL,
@@ -18,6 +20,7 @@ CREATE TABLE IF NOT EXISTS vehicle_entries (
   inside_at     DATETIME      NULL,
 
   INDEX idx_vehicle_no (vehicle_no),
+  INDEX idx_token (token),
   INDEX idx_is_inside_submitted (is_inside, submitted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

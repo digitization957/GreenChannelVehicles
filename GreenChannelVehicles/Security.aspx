@@ -57,6 +57,8 @@
             </div>
             <div class="v-card__rows">
                 <div class="v-card__row"><span class="k">Transporter</span><span class="v" data-f="transporter"></span></div>
+                <div class="v-card__row"><span class="k">Buyer name</span><span class="v" data-f="buyerName"></span></div>
+                <div class="v-card__row"><span class="k">Token</span><span class="v" data-f="token"></span></div>
                 <div class="v-card__row"><span class="k">Without PCS</span><span class="v" data-f="withoutPCS"></span></div>
                 <div class="v-card__row"><span class="k">Manual PCS</span><span class="v" data-f="manualPCS"></span></div>
             </div>

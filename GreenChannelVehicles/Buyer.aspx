@@ -41,6 +41,18 @@
                     <p class="error-msg">Enter the transporter name.</p>
                 </div>
 
+                <div class="field" id="fieldBuyerName">
+                    <label for="buyerName">Buyer name<span class="req-mark">*</span></label>
+                    <input type="text" id="buyerName" maxlength="60" autocomplete="off" placeholder="Your name" required aria-required="true" />
+                    <p class="error-msg">Enter a valid buyer name (2-60 letters).</p>
+                </div>
+
+                <div class="field" id="fieldToken">
+                    <label for="token">Token<span class="req-mark">*</span></label>
+                    <input type="text" id="token" maxlength="20" autocomplete="off" placeholder="e.g. TKN1234" required aria-required="true" />
+                    <p class="error-msg">Enter a valid token (3-20 letters/digits).</p>
+                </div>
+
                 <div class="pcs-row">
                     <div class="field" id="fieldWithoutPCS">
                         <fieldset>

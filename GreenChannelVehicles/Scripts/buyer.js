@@ -3,6 +3,8 @@
 
     var VEHICLE_RE = /^[A-Za-z0-9\- ]{4,15}$/;
     var TRANSPORTER_RE = /^[A-Za-z0-9&.,\- ]{2,60}$/;
+    var BUYER_NAME_RE = /^[A-Za-z .,'\-]{2,60}$/;
+    var TOKEN_RE = /^[A-Za-z0-9\-]{3,20}$/;
     var UNSAFE_RE = /[<>"']/;
 
     var $form = $('#vehicleForm');
@@ -51,6 +53,18 @@
             ok = false;
         }
 
+        var buyerName = $('#buyerName').val().trim();
+        if (!BUYER_NAME_RE.test(buyerName)) {
+            $('#fieldBuyerName').addClass('has-error');
+            ok = false;
+        }
+
+        var token = $('#token').val().trim();
+        if (!TOKEN_RE.test(token)) {
+            $('#fieldToken').addClass('has-error');
+            ok = false;
+        }
+
         var material = $material.val().trim();
         if (material.length < 1 || material.length > 50 || UNSAFE_RE.test(material)) {
             $('#fieldMaterial').addClass('has-error');
@@ -68,6 +82,8 @@
         return {
             vehicleNo: $('#vehicleNo').val().trim(),
             transporter: $('#transporter').val().trim(),
+            buyerName: $('#buyerName').val().trim(),
+            token: $('#token').val().trim(),
             withoutPCS: withoutVal,
             manualPCS: manualVal,
             material: $material.val().trim()
@@ -132,6 +148,8 @@
         var rows = [
             ['Vehicle number', data.vehicleNo],
             ['Transporter', data.transporter],
+            ['Buyer name', data.buyerName],
+            ['Token', data.token],
             ['Without PCS', pcsLabel(data.withoutPCS)],
             ['Manual PCS', data.withoutPCS === true ? 'N/A' : pcsLabel(data.manualPCS)],
             ['Material', data.material],

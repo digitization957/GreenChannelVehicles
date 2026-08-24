@@ -42,7 +42,9 @@
         term = term.toLowerCase();
         return v.vehicleNo.toLowerCase().indexOf(term) !== -1 ||
             v.transporter.toLowerCase().indexOf(term) !== -1 ||
-            v.material.toLowerCase().indexOf(term) !== -1;
+            v.material.toLowerCase().indexOf(term) !== -1 ||
+            (v.buyerName || '').toLowerCase().indexOf(term) !== -1 ||
+            (v.token || '').toLowerCase().indexOf(term) !== -1;
     }
 
     function showToast(v) {
@@ -74,6 +76,8 @@
         }
 
         $card.find('[data-f="transporter"]').empty().append(highlightText(v.transporter, term));
+        $card.find('[data-f="buyerName"]').empty().append(highlightText(v.buyerName, term));
+        $card.find('[data-f="token"]').empty().append(highlightText(v.token, term));
         $card.find('[data-f="withoutPCS"]').text(pcsLabel(v.withoutPCS));
         $card.find('[data-f="manualPCS"]').text(v.withoutPCS === true ? 'N/A' : pcsLabel(v.manualPCS));
         $card.find('[data-f="material"]').empty().append(highlightText(v.material, term));
