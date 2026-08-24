@@ -33,6 +33,11 @@
   --color-danger-soft: oklch(95% 0.03 25);
   --color-focus: oklch(52% 0.19 27);
 
+  /* Number plate badge */
+  --color-plate-yellow: oklch(84% 0.16 92);
+  --color-plate-border: oklch(16% 0 0);
+  --color-plate-blue: oklch(38% 0.13 260);
+
   /* Type */
   --font-display: 'Space Grotesk', 'Segoe UI Semibold', system-ui, sans-serif;
   --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -142,18 +147,11 @@ a { color: var(--color-accent); }
 }
 
 .topbar__mark {
-  width: 34px;
   height: 34px;
+  width: auto;
   border-radius: var(--radius-sm);
-  background: var(--color-accent);
-  color: var(--color-accent-ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-sm);
   flex-shrink: 0;
+  display: block;
 }
 
 .topbar__text { min-width: 0; }
@@ -596,15 +594,15 @@ fieldset { border: none; padding: 0; margin: 0; }
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(0, 1fr));
-  gap: var(--space-lg);
+  gap: var(--space-sm);
 }
-@media (min-width: 560px) { .card-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); } }
+@media (min-width: 560px) { .card-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); } }
 
 .v-card {
   background: #fff;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   box-shadow: var(--shadow-sm);
   min-width: 0;
   animation: card-in var(--dur-slow) var(--ease-out);
@@ -629,14 +627,40 @@ fieldset { border: none; padding: 0; margin: 0; }
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--space-sm);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.v-card__plate-badge {
+  display: inline-flex;
+  align-items: stretch;
+  background: var(--color-plate-yellow);
+  border: 2px solid var(--color-plate-border);
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 1px 0 oklch(100% 0 0 / 0.5) inset;
+}
+.v-card__plate-ind {
+  background: var(--color-plate-blue);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.55rem;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.4em;
+  border-right: 1px solid var(--color-plate-border);
 }
 
 .v-card__plate {
-  font-family: var(--font-mono);
-  font-size: var(--text-lg);
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
   letter-spacing: 0.02em;
+  color: var(--color-plate-border);
+  padding: 0.15em 0.5em 0.15em 0.4em;
   overflow-wrap: anywhere;
 }
 
@@ -647,7 +671,7 @@ fieldset { border: none; padding: 0; margin: 0; }
 .status-tag.is-inside { color: var(--color-ink-faint); font-weight: 500; }
 .status-tag.is-inside svg { width: 13px; height: 13px; }
 
-.v-card__rows { display: grid; gap: var(--space-xs); margin-bottom: var(--space-md); }
+.v-card__rows { display: grid; gap: var(--space-2xs); margin-bottom: var(--space-sm); }
 
 .v-card__row {
   display: flex;
@@ -663,8 +687,8 @@ fieldset { border: none; padding: 0; margin: 0; }
   font-size: var(--text-sm);
   background: var(--color-paper-3);
   border-radius: var(--radius-sm);
-  padding: var(--space-sm);
-  margin-bottom: var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
+  margin-bottom: var(--space-sm);
   overflow-wrap: anywhere;
 }
 .v-card.is-inside .v-card__material { background: #fff; }
@@ -672,7 +696,7 @@ fieldset { border: none; padding: 0; margin: 0; }
 .v-card__meta {
   font-size: var(--text-xs);
   color: var(--color-ink-faint);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 mark { background: var(--color-accent-soft); color: var(--color-ink); border-radius: 3px; padding: 0 0.1em; }

@@ -10,7 +10,7 @@
 <body>
     <header class="topbar">
         <div class="topbar__identity">
-            <div class="topbar__mark" aria-hidden="true">GC</div>
+            <img class="topbar__mark" src="gclogo.webp" alt="Green Channel Vehicles" />
             <div class="topbar__text">
                 <div class="topbar__title">Green Channel Vehicles</div>
                 <div class="topbar__subtitle">Buyer -Gate Entry Request</div>

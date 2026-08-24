@@ -23,6 +23,14 @@
         return v === true ? 'Yes' : v === false ? 'No' : 'Not specified';
     }
 
+    // "MH12XY5566" -> "MH 12 XY5566": space after chars 1-2, space after chars 3-4.
+    function formatPlate(raw) {
+        var s = (raw == null ? '' : String(raw)).replace(/\s+/g, '');
+        if (s.length <= 2) return s;
+        if (s.length <= 4) return s.slice(0, 2) + ' ' + s.slice(2);
+        return s.slice(0, 2) + ' ' + s.slice(2, 4) + ' ' + s.slice(4);
+    }
+
     function highlightText(text, term) {
         text = text == null ? '' : String(text);
         if (!term) return document.createTextNode(text);
@@ -50,7 +58,7 @@
     function showToast(v) {
         var $toast = $('<div class="toast"></div>');
         $toast.append(document.createTextNode('New vehicle · '));
-        $toast.append($('<strong>').text(v.vehicleNo));
+        $toast.append($('<strong>').text(formatPlate(v.vehicleNo)));
         $toastStack.append($toast);
         setTimeout(function () {
             $toast.addClass('is-leaving');
@@ -66,7 +74,7 @@
         $card.toggleClass('is-inside', v.isInside);
         if (isNew) $card.addClass('is-new');
 
-        $card.find('.v-card__plate').empty().append(highlightText(v.vehicleNo, term));
+        $card.find('.v-card__plate').empty().append(highlightText(formatPlate(v.vehicleNo), term));
 
         var $status = $card.find('.v-card__status');
         if (v.isInside) {

@@ -10,7 +10,7 @@
 <body>
     <header class="topbar">
         <div class="topbar__identity">
-            <div class="topbar__mark" aria-hidden="true">GC</div>
+            <img class="topbar__mark" src="gclogo.webp" alt="Green Channel Vehicles" />
             <div class="topbar__text">
                 <div class="topbar__title">Green Channel Vehicles</div>
                 <div class="topbar__subtitle">Security -Gate Watch</div>
@@ -52,7 +52,7 @@
     <script id="cardTemplate" type="text/x-template">
         <article class="v-card" data-id="">
             <div class="v-card__head">
-                <div class="v-card__plate"></div>
+                <span class="v-card__plate-badge"><span class="v-card__plate-ind">IND</span><span class="v-card__plate"></span></span>
                 <span class="v-card__status"></span>
             </div>
             <div class="v-card__rows">
