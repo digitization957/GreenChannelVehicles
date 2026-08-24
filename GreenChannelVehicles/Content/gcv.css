@@ -277,8 +277,8 @@ a { color: var(--color-accent); }
 
 .req-mark { color: var(--color-danger); margin-left: 0.15em; }
 
-.pcs-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); }
-@media (max-width: 420px) { .pcs-row { grid-template-columns: 1fr; gap: 0; } }
+.pcs-row, .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); }
+@media (max-width: 420px) { .pcs-row, .field-row { grid-template-columns: 1fr; gap: 0; } }
 
 .field .hint {
   font-size: var(--text-xs);
