@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var POLL_MS = 3000;
+    var POLL_MS = 10000;
     var $grid = $('#cardGrid');
     var $empty = $('#emptyState');
     var $emptyTitle = $('#emptyTitle');
@@ -13,7 +13,7 @@
     var template = document.getElementById('cardTemplate').innerHTML;
     var pollTimer = null;
     var busyIds = {};
-    var seenIds = {};
+    var cardsById = {};
     var firstLoad = true;
     var searchTerm = '';
 
@@ -56,8 +56,10 @@
         }, 3200);
     }
 
-    function buildCard(v, term, isNew) {
-        var $card = $($.parseHTML(template.trim()));
+    // Fills (or refreshes) a card's content in place. Never recreates the DOM
+    // node, so an already-rendered card just patches text on each poll instead
+    // of flickering / losing hover-focus-scroll state.
+    function fillCard($card, v, term, isNew) {
         $card.attr('data-id', v.id);
         $card.toggleClass('is-inside', v.isInside);
         if (isNew) $card.addClass('is-new');
@@ -83,17 +85,33 @@
         var $btn = $card.find('[data-action="inside"]');
         if (v.isInside) {
             $btn.remove();
-        } else {
-            $btn.on('click', function () { markInside(v.id, $card); });
-            if (busyIds[v.id]) $btn.addClass('is-loading').prop('disabled', true);
+        } else if ($btn.length) {
+            $btn.toggleClass('is-loading', !!busyIds[v.id]).prop('disabled', !!busyIds[v.id]);
         }
 
         return $card;
     }
 
+    function createCard(v, term, isNew) {
+        var $card = $($.parseHTML(template.trim()));
+        return fillCard($card, v, term, isNew);
+    }
+
+    // Reconciles the DOM against the latest vehicle list: updates cards that
+    // are still present in place, inserts genuinely new ones, removes ones
+    // that dropped out (e.g. filtered by search), and only moves a card's
+    // position when the server order actually changed.
     function render(vehicles) {
         var visible = vehicles.filter(function (v) { return matchesSearch(v, searchTerm); });
-        $grid.empty();
+        var visibleIds = {};
+        visible.forEach(function (v) { visibleIds[v.id] = true; });
+
+        Object.keys(cardsById).forEach(function (id) {
+            if (!visibleIds[id]) {
+                cardsById[id].remove();
+                delete cardsById[id];
+            }
+        });
 
         if (!vehicles.length) {
             $empty.show();
@@ -105,14 +123,28 @@
             $emptyBody.text('No vehicle, transporter or material matches "' + searchTerm + '".');
         } else {
             $empty.hide();
-            visible.forEach(function (v) {
-                var isNew = !firstLoad && !seenIds[v.id];
-                $grid.append(buildCard(v, searchTerm, isNew));
-                if (isNew) showToast(v);
-            });
         }
 
-        vehicles.forEach(function (v) { seenIds[v.id] = true; });
+        var $prev = null;
+        visible.forEach(function (v) {
+            var isNew = !cardsById[v.id];
+            var $card;
+            if (isNew) {
+                $card = createCard(v, searchTerm, !firstLoad);
+                cardsById[v.id] = $card;
+                if (!firstLoad) showToast(v);
+            } else {
+                $card = fillCard(cardsById[v.id], v, searchTerm, false);
+            }
+
+            if ($prev === null) {
+                if (!$grid.children().first().is($card)) $grid.prepend($card);
+            } else if (!$prev.next().is($card)) {
+                $prev.after($card);
+            }
+            $prev = $card;
+        });
+
         firstLoad = false;
     }
 
@@ -137,10 +169,25 @@
         });
     }
 
+    function startPolling() {
+        if (pollTimer) return;
+        pollTimer = setInterval(function () { refresh(false); }, POLL_MS);
+    }
+
+    function stopPolling() {
+        if (!pollTimer) return;
+        clearInterval(pollTimer);
+        pollTimer = null;
+    }
+
+    // While a "mark inside" call is in flight, polling is paused so no stale
+    // list can overwrite the optimistic loading state; it resumes (with an
+    // immediate resync) the moment the server confirms the write.
     function markInside(id, $card) {
         busyIds[id] = true;
         var $btn = $card.find('[data-action="inside"]');
         $btn.addClass('is-loading').prop('disabled', true);
+        stopPolling();
 
         $.ajax({
             url: 'Security.aspx/MarkVehicleInside',
@@ -161,8 +208,15 @@
             delete busyIds[id];
             $btn.removeClass('is-loading').prop('disabled', false);
             $errorBanner.text('Network error while updating vehicle.').show();
+        }).always(function () {
+            startPolling();
         });
     }
+
+    $grid.on('click', '[data-action="inside"]', function () {
+        var $card = $(this).closest('.v-card');
+        markInside($card.attr('data-id'), $card);
+    });
 
     $searchInput.on('input', function () {
         searchTerm = $searchInput.val().trim();
@@ -179,9 +233,7 @@
     });
 
     refresh(true);
-    pollTimer = setInterval(function () { refresh(false); }, POLL_MS);
+    startPolling();
 
-    $(window).on('beforeunload', function () {
-        if (pollTimer) clearInterval(pollTimer);
-    });
+    $(window).on('beforeunload', stopPolling);
 })();
