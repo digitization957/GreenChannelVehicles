@@ -14,3 +14,4 @@
 - Backend (VehicleGateStore, Buyer.aspx.cs) updated: WithoutPCS is now nullable and no longer enforced server-side, matching the relaxed validation.
 - Added App_Data/schema.sql: MySQL schema (gcv_db.vehicle_entries table matching VehicleEntry fields) + least-privilege app user. Not wired into the app yet — DB access wasn't available in this environment, app still runs on the in-memory VehicleGateStore.
 - Built the app (no Visual Studio/MSBuild web targets installed) and ran it via IIS Express on http://localhost:8080 — Default/Buyer/Security all return 200.
+- Fixed Security dashboard toolbar: stat chips (Live/Pending/Inside) + search bar now stay right-aligned instead of drifting to center when wrapping on mid-width screens.
