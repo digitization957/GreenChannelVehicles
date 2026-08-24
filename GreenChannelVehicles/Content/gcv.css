@@ -265,6 +265,21 @@ a { color: var(--color-accent); }
 
 .field { margin-bottom: var(--space-lg); }
 
+.form-section + .form-section {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+.form-section__title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-faint);
+  margin-bottom: var(--space-md);
+}
+
 .field label,
 .field legend {
   display: block;

@@ -29,72 +29,78 @@
             <div id="errorBanner" class="banner banner-error" style="display:none;" role="alert"></div>
 
             <form id="vehicleForm" novalidate>
-                <div class="field-row">
-                    <div class="field" id="fieldBuyerName">
-                        <label for="buyerName">Buyer name<span class="req-mark">*</span></label>
-                        <input type="text" id="buyerName" maxlength="60" autocomplete="off" placeholder="Your name" required aria-required="true" />
-                        <p class="error-msg">Enter a valid buyer name (2-60 letters).</p>
-                    </div>
+                <div class="form-section">
+                    <div class="form-section__title">Buyer information</div>
+                    <div class="field-row">
+                        <div class="field" id="fieldBuyerName">
+                            <label for="buyerName">Buyer name<span class="req-mark">*</span></label>
+                            <input type="text" id="buyerName" maxlength="60" autocomplete="off" placeholder="Your name" required aria-required="true" />
+                            <p class="error-msg">Enter a valid buyer name (2-60 letters).</p>
+                        </div>
 
-                    <div class="field" id="fieldToken">
-                        <label for="token">Token<span class="req-mark">*</span></label>
-                        <input type="text" id="token" maxlength="20" autocomplete="off" placeholder="e.g. TKN1234" required aria-required="true" />
-                        <p class="error-msg">Enter a valid token (3-20 letters/digits).</p>
-                    </div>
-                </div>
-
-                <div class="field" id="fieldVehicleNo">
-                    <label for="vehicleNo">Vehicle number<span class="req-mark">*</span></label>
-                    <input type="text" id="vehicleNo" maxlength="15" autocomplete="off" placeholder="e.g. MH12AB1234" required aria-required="true" />
-                    <p class="error-msg">Enter a valid vehicle number (4-15 letters/digits).</p>
-                </div>
-
-                <div class="field" id="fieldTransporter">
-                    <label for="transporter">Transporter<span class="req-mark">*</span></label>
-                    <input type="text" id="transporter" maxlength="60" autocomplete="off" placeholder="Transporter name" required aria-required="true" />
-                    <p class="error-msg">Enter the transporter name.</p>
-                </div>
-
-                <div class="pcs-row">
-                    <div class="field" id="fieldWithoutPCS">
-                        <fieldset>
-                            <legend>Without PCS</legend>
-                            <div class="toggle-group" id="withoutPCSGroup">
-                                <div class="toggle-option">
-                                    <input type="radio" name="withoutPCS" id="withoutPCSYes" value="yes" />
-                                    <label for="withoutPCSYes">Yes</label>
-                                </div>
-                                <div class="toggle-option">
-                                    <input type="radio" name="withoutPCS" id="withoutPCSNo" value="no" />
-                                    <label for="withoutPCSNo">No</label>
-                                </div>
-                            </div>
-                        </fieldset>
-                        <p class="hint">"Yes" disables Manual PCS.</p>
-                    </div>
-
-                    <div class="field" id="fieldManualPCS">
-                        <fieldset>
-                            <legend>Manual PCS</legend>
-                            <div class="toggle-group" id="manualPCSGroup">
-                                <div class="toggle-option">
-                                    <input type="radio" name="manualPCS" id="manualPCSYes" value="yes" />
-                                    <label for="manualPCSYes">Yes</label>
-                                </div>
-                                <div class="toggle-option">
-                                    <input type="radio" name="manualPCS" id="manualPCSNo" value="no" />
-                                    <label for="manualPCSNo">No</label>
-                                </div>
-                            </div>
-                        </fieldset>
+                        <div class="field" id="fieldToken">
+                            <label for="token">Token<span class="req-mark">*</span></label>
+                            <input type="text" id="token" maxlength="20" autocomplete="off" placeholder="e.g. TKN1234" required aria-required="true" />
+                            <p class="error-msg">Enter a valid token (3-20 letters/digits).</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="field" id="fieldMaterial">
-                    <label for="material">Material details<span class="req-mark">*</span></label>
-                    <input type="text" id="material" maxlength="50" autocomplete="off" placeholder="What is the vehicle carrying?" required aria-required="true" />
-                    <div class="char-count"><span id="materialCount">0</span>/50</div>
-                    <p class="error-msg">Enter material details (up to 50 characters).</p>
+                <div class="form-section">
+                    <div class="form-section__title">Vehicle information</div>
+                    <div class="field" id="fieldVehicleNo">
+                        <label for="vehicleNo">Vehicle number<span class="req-mark">*</span></label>
+                        <input type="text" id="vehicleNo" maxlength="15" autocomplete="off" placeholder="e.g. MH12AB1234" required aria-required="true" />
+                        <p class="error-msg">Enter a valid vehicle number (4-15 letters/digits).</p>
+                    </div>
+
+                    <div class="field" id="fieldTransporter">
+                        <label for="transporter">Transporter<span class="req-mark">*</span></label>
+                        <input type="text" id="transporter" maxlength="60" autocomplete="off" placeholder="Transporter name" required aria-required="true" />
+                        <p class="error-msg">Enter the transporter name.</p>
+                    </div>
+
+                    <div class="pcs-row">
+                        <div class="field" id="fieldWithoutPCS">
+                            <fieldset>
+                                <legend>Without PCS</legend>
+                                <div class="toggle-group" id="withoutPCSGroup">
+                                    <div class="toggle-option">
+                                        <input type="radio" name="withoutPCS" id="withoutPCSYes" value="yes" />
+                                        <label for="withoutPCSYes">Yes</label>
+                                    </div>
+                                    <div class="toggle-option">
+                                        <input type="radio" name="withoutPCS" id="withoutPCSNo" value="no" />
+                                        <label for="withoutPCSNo">No</label>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <p class="hint">"Yes" disables Manual PCS.</p>
+                        </div>
+
+                        <div class="field" id="fieldManualPCS">
+                            <fieldset>
+                                <legend>Manual PCS</legend>
+                                <div class="toggle-group" id="manualPCSGroup">
+                                    <div class="toggle-option">
+                                        <input type="radio" name="manualPCS" id="manualPCSYes" value="yes" />
+                                        <label for="manualPCSYes">Yes</label>
+                                    </div>
+                                    <div class="toggle-option">
+                                        <input type="radio" name="manualPCS" id="manualPCSNo" value="no" />
+                                        <label for="manualPCSNo">No</label>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+
+                    <div class="field" id="fieldMaterial">
+                        <label for="material">Material details<span class="req-mark">*</span></label>
+                        <input type="text" id="material" maxlength="50" autocomplete="off" placeholder="What is the vehicle carrying?" required aria-required="true" />
+                        <div class="char-count"><span id="materialCount">0</span>/50</div>
+                        <p class="error-msg">Enter material details (up to 50 characters).</p>
+                    </div>
                 </div>
 
                 <div style="display:flex; gap: var(--space-sm); margin-top: var(--space-xl);">
