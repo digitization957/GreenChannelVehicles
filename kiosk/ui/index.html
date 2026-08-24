@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Gate Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* ---------- board tokens (approved design) ---------- */
+  body {
+    --p: oklch(98% 0.004 85);
+    --p2: oklch(100% 0 0);
+    --p3: oklch(95.5% 0.006 85);
+    --ink: oklch(20% 0.012 260);
+    --ink-dim: oklch(46% 0.012 260);
+    --red: oklch(52% 0.19 27);
+    --plate-yellow: oklch(84% 0.16 92);
+    --plate-border: oklch(16% 0 0);
+    --plate-blue: oklch(38% 0.13 260);
+
+    background: var(--p);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .board { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+
+  .bd-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.04% 2.2%;
+    border-bottom: 2px solid var(--red);
+    flex-shrink: 0;
+  }
+  .bd-logo { display: flex; align-items: center; flex-shrink: 0; }
+  .bd-logo img { height: clamp(16px, 2.6vw, 30px); display: block; }
+  .bd-logo-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: clamp(16px, 2.6vw, 30px);
+    padding: 0 0.9em;
+    border: 1.5px dashed var(--ink-dim);
+    border-radius: 5px;
+    color: var(--ink-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.5rem, 1vw, 0.68rem);
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+
+  .bd-cols {
+    display: grid;
+    grid-template-columns: 42% 30% 28%;
+    background: var(--red);
+    padding: 0.7% 2.2%;
+    font-size: clamp(0.5rem, 1vw, 0.72rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: white;
+    flex-shrink: 0;
+  }
+  .bd-rows { flex: 1; overflow: hidden; display: flex; flex-direction: column; padding-top: 0.6%; }
+  .bd-row {
+    display: grid;
+    grid-template-columns: 42% 30% 28%;
+    align-items: center;
+    padding: 1.4% 2.2%;
+    font-size: clamp(0.6rem, 1.25vw, 0.92rem);
+  }
+  .bd-row:nth-child(odd) { background: var(--p2); }
+  .bd-row:nth-child(even) { background: var(--p3); }
+  .bd-row .c { padding-right: 0.6em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .bd-plate {
+    display: inline-flex;
+    align-items: stretch;
+    background: var(--plate-yellow);
+    border: 2px solid var(--plate-border);
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 1px 0 oklch(100% 0 0 / 0.5) inset, 0 2px 4px oklch(20% 0 0 / 0.18);
+  }
+  .bd-plate .ind {
+    background: var(--plate-blue);
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.4rem, 0.85vw, 0.6rem);
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.5em;
+    border-right: 1px solid var(--plate-border);
+  }
+  .bd-plate .num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(1rem, 2.6vw, 1.9rem);
+    letter-spacing: 0.03em;
+    color: var(--plate-border);
+    padding: 0.12em 0.5em 0.12em 0.4em;
+  }
+
+  .bd-transporter {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.1rem, 2.3vw, 1.7rem);
+    letter-spacing: 0.005em;
+  }
+  .bd-material {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: clamp(0.95rem, 2vw, 1.45rem);
+  }
+
+  .bd-foot {
+    flex-shrink: 0;
+    background: var(--red);
+    color: white;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0.35% 2.2%;
+  }
+  .bd-foot-time { display: flex; align-items: baseline; gap: 0.6em; }
+  .bd-foot-clock { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: clamp(0.6rem, 1.25vw, 0.9rem); font-variant-numeric: tabular-nums; }
+  .bd-foot-date { font-size: clamp(0.5rem, 0.9vw, 0.68rem); opacity: 0.85; }
+
+  .bd-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-dim);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1rem, 2.4vw, 1.7rem);
+    text-align: center;
+  }
+
+  .bd-error {
+    position: fixed;
+    left: 2.2%;
+    bottom: calc(2.2% + 3em);
+    background: var(--plate-border);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.5rem, 1vw, 0.7rem);
+    padding: 0.5em 0.9em;
+    border-radius: 5px;
+    opacity: 0.85;
+    display: none;
+  }
+  .bd-error.is-visible { display: block; }
+</style>
+</head>
+<body>
+  <div class="board">
+    <div class="bd-head">
+      <div class="bd-logo-placeholder" id="gcLogoFallback">gclogo.webp</div>
+      <img class="bd-logo" id="gcLogoImg" src="assets/gclogo.webp" alt="" style="display:none; height: clamp(16px, 2.6vw, 30px);" />
+      <img class="bd-logo" src="assets/mahindra-rise.png" alt="Mahindra Rise" />
+    </div>
+
+    <div class="bd-cols">
+      <div>Vehicle No</div><div>Transporter</div><div>Material</div>
+    </div>
+
+    <div class="bd-rows" id="rows"></div>
+    <div class="bd-empty" id="emptyState" style="display:none;">No vehicles pending</div>
+
+    <div class="bd-foot">
+      <div class="bd-foot-time">
+        <div class="bd-foot-clock" data-clock>00:00:00</div>
+        <div class="bd-foot-date" data-date></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bd-error" id="errorBanner"></div>
+
+  <script id="rowTemplate" type="text/x-template">
+    <div class="bd-row">
+      <div class="c"><span class="bd-plate"><span class="ind">IND</span><span class="num" data-f="plate"></span></span></div>
+      <div class="c bd-transporter" data-f="transporter"></div>
+      <div class="c bd-material" data-f="material"></div>
+    </div>
+  </script>
+
+  <script>
+    (function () {
+      var $rows = document.getElementById('rows');
+      var $empty = document.getElementById('emptyState');
+      var $error = document.getElementById('errorBanner');
+      var $gcLogoImg = document.getElementById('gcLogoImg');
+      var $gcLogoFallback = document.getElementById('gcLogoFallback');
+      var template = document.getElementById('rowTemplate').innerHTML;
+
+      $gcLogoImg.addEventListener('load', function () {
+        $gcLogoImg.style.display = '';
+        $gcLogoFallback.style.display = 'none';
+      });
+      $gcLogoImg.addEventListener('error', function () {
+        $gcLogoImg.style.display = 'none';
+        $gcLogoFallback.style.display = '';
+      });
+
+      function formatPlate(raw) {
+        var s = String(raw || '').replace(/\s+/g, '').toUpperCase();
+        if (s.length <= 2) return s;
+        if (s.length <= 4) return s.slice(0, 2) + ' ' + s.slice(2);
+        return s.slice(0, 2) + ' ' + s.slice(2, 4) + ' ' + s.slice(4);
+      }
+
+      function render(vehicles) {
+        $rows.innerHTML = '';
+        if (!vehicles.length) {
+          $empty.style.display = '';
+          return;
+        }
+        $empty.style.display = 'none';
+        vehicles.forEach(function (v) {
+          var $row = document.createElement('div');
+          $row.innerHTML = template.trim();
+          var $node = $row.firstElementChild;
+          $node.querySelector('[data-f="plate"]').textContent = formatPlate(v.vehicle_no);
+          $node.querySelector('[data-f="transporter"]').textContent = v.transporter;
+          $node.querySelector('[data-f="material"]').textContent = v.material;
+          $rows.appendChild($node);
+        });
+      }
+
+      function showError(msg) {
+        $error.textContent = msg;
+        $error.classList.add('is-visible');
+      }
+      function clearError() {
+        $error.classList.remove('is-visible');
+      }
+
+      function connect() {
+        var ws = new WebSocket('ws://127.0.0.1:8765');
+        ws.onmessage = function (evt) {
+          var msg = JSON.parse(evt.data);
+          if (msg.type === 'vehicles') {
+            clearError();
+            render(msg.vehicles || []);
+          } else if (msg.type === 'error') {
+            showError('Data feed error: ' + msg.message);
+          }
+        };
+        ws.onclose = function () {
+          showError('Reconnecting to gate feed...');
+          setTimeout(connect, 2000);
+        };
+        ws.onerror = function () {
+          ws.close();
+        };
+      }
+      connect();
+
+      function tick() {
+        var now = new Date();
+        var time = [now.getHours(), now.getMinutes(), now.getSeconds()]
+          .map(function (n) { return String(n).padStart(2, '0'); })
+          .join(':');
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var date = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+        document.querySelectorAll('[data-clock]').forEach(function (el) { el.textContent = time; });
+        document.querySelectorAll('[data-date]').forEach(function (el) { el.textContent = date; });
+      }
+      tick();
+      setInterval(tick, 1000);
+
+      document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    })();
+  </script>
+</body>
+</html>
