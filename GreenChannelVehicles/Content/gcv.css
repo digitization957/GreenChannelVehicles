@@ -75,7 +75,14 @@
 
 * { box-sizing: border-box; }
 html, body { overflow-x: clip; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; font-size: 16px; }
+
+/* Every spacing/type/radius token above is rem-based off this root size, so
+   dropping it scales the whole UI proportionally for short 720p viewports
+   (built/reviewed on 1080p, where the same px values read comfortably). */
+@media (max-height: 800px) {
+  html { font-size: 14px; }
+}
 
 body {
   margin: 0;
