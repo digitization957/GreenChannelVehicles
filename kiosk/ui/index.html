@@ -62,10 +62,10 @@
 
   .bd-cols {
     display: grid;
-    grid-template-columns: 42% 30% 28%;
+    grid-template-columns: 34% 26% 24% 16%;
     background: var(--red);
     padding: 0.7% 2.2%;
-    font-size: clamp(0.5rem, 1vw, 0.72rem);
+    font-size: clamp(0.75rem, 1.5vw, 1.05rem);
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -75,7 +75,7 @@
   .bd-rows { flex: 1; overflow: hidden; display: flex; flex-direction: column; padding-top: 0.6%; }
   .bd-row {
     display: grid;
-    grid-template-columns: 42% 30% 28%;
+    grid-template-columns: 34% 26% 24% 16%;
     align-items: center;
     padding: 1.4% 2.2%;
     font-size: clamp(0.6rem, 1.25vw, 0.92rem);
@@ -122,11 +122,18 @@
     font-size: clamp(1.1rem, 2.3vw, 1.7rem);
     letter-spacing: 0.005em;
   }
-  .bd-material {
+  .bd-pg {
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 500;
     font-size: clamp(0.95rem, 2vw, 1.45rem);
   }
+  .bd-pcs {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: clamp(0.95rem, 2vw, 1.45rem);
+    text-align: center;
+  }
+  .bd-cols > div:nth-child(4) { text-align: center; }
 
   .bd-foot {
     flex-shrink: 0;
@@ -178,13 +185,13 @@
 <body>
   <div class="board">
     <div class="bd-head">
-      <div class="bd-logo-placeholder" id="gcLogoFallback">gclogo.webp</div>
-      <img class="bd-logo" id="gcLogoImg" src="assets/gclogo.webp" alt="" style="display:none; height: clamp(16px, 2.6vw, 30px);" />
+      <div class="bd-logo-placeholder" id="gcLogoFallback">gclogo.png</div>
+      <img class="bd-logo" id="gcLogoImg" src="assets/gclogo.png" alt="Green Channel" style="display:none;" />
       <img class="bd-logo" src="assets/mahindra-rise.png" alt="Mahindra Rise" />
     </div>
 
     <div class="bd-cols">
-      <div>Vehicle No</div><div>Transporter</div><div>Material</div>
+      <div>Vehicle No</div><div>Transporter</div><div>Receiving PG</div><div>Without PCS</div>
     </div>
 
     <div class="bd-rows" id="rows"></div>
@@ -205,7 +212,8 @@
     <div class="bd-row">
       <div class="c"><span class="bd-plate"><span class="ind">IND</span><span class="num" data-f="plate"></span></span></div>
       <div class="c bd-transporter" data-f="transporter"></div>
-      <div class="c bd-material" data-f="material"></div>
+      <div class="c bd-pg" data-f="pgName"></div>
+      <div class="c bd-pcs" data-f="withoutPcs"></div>
     </div>
   </script>
 
@@ -235,11 +243,82 @@
         return s.slice(0, 2) + ' ' + s.slice(2, 4) + ' ' + s.slice(4);
       }
 
+      function pcsLabel(v) {
+        return v === true || v === 1 ? 'Yes' : v === false || v === 0 ? 'No' : '\u2014';
+      }
+
+      // ---- Auto-scroll: slow continuous top-to-bottom loop, only while rows overflow ----
+      var SCROLL_SPEED_PX_PER_SEC = 28;
+      var SCROLL_PAUSE_MS = 1400;
+      var scrollLoopActive = false;
+      var scrollLoopToken = 0;
+
+      function maxScrollTop() {
+        return Math.max(0, $rows.scrollHeight - $rows.clientHeight);
+      }
+
+      function animateScrollTop(toTop, duration, token, onDone) {
+        var fromTop = $rows.scrollTop;
+        var startTime = null;
+        function step(ts) {
+          if (token !== scrollLoopToken) return;
+          if (startTime === null) startTime = ts;
+          var t = duration <= 0 ? 1 : Math.min(1, (ts - startTime) / duration);
+          var cappedTarget = Math.min(toTop, maxScrollTop());
+          $rows.scrollTop = fromTop + (cappedTarget - fromTop) * t;
+          if (t < 1) {
+            requestAnimationFrame(step);
+          } else if (onDone) {
+            onDone();
+          }
+        }
+        requestAnimationFrame(step);
+      }
+
+      function runScrollLoop(token) {
+        if (token !== scrollLoopToken) return;
+        var distance = maxScrollTop();
+        if (distance <= 0) {
+          scrollLoopActive = false;
+          return;
+        }
+        var duration = (distance / SCROLL_SPEED_PX_PER_SEC) * 1000;
+        animateScrollTop(distance, duration, token, function () {
+          if (token !== scrollLoopToken) return;
+          setTimeout(function () {
+            if (token !== scrollLoopToken) return;
+            $rows.scrollTop = 0;
+            setTimeout(function () { runScrollLoop(token); }, SCROLL_PAUSE_MS);
+          }, SCROLL_PAUSE_MS);
+        });
+      }
+
+      function syncAutoScroll() {
+        var overflowing = maxScrollTop() > 0;
+        if (overflowing && !scrollLoopActive) {
+          // Newly overflowing (or first run): start a fresh loop from the top.
+          scrollLoopActive = true;
+          scrollLoopToken += 1;
+          $rows.scrollTop = 0;
+          runScrollLoop(scrollLoopToken);
+        } else if (!overflowing && scrollLoopActive) {
+          // No longer overflowing: stop and snap back to top.
+          scrollLoopActive = false;
+          scrollLoopToken += 1;
+          $rows.scrollTop = 0;
+        }
+        // If still overflowing and already looping, leave the in-progress cycle
+        // untouched so newly added rows at the top only appear on the next pass.
+      }
+
       function render(vehicles) {
         $rows.innerHTML = '';
         $pendingCount.textContent = vehicles.length;
         if (!vehicles.length) {
           $empty.style.display = '';
+          scrollLoopActive = false;
+          scrollLoopToken += 1;
+          $rows.scrollTop = 0;
           return;
         }
         $empty.style.display = 'none';
@@ -249,9 +328,11 @@
           var $node = $row.firstElementChild;
           $node.querySelector('[data-f="plate"]').textContent = formatPlate(v.vehicle_no);
           $node.querySelector('[data-f="transporter"]').textContent = v.transporter;
-          $node.querySelector('[data-f="material"]').textContent = v.material;
+          $node.querySelector('[data-f="pgName"]').textContent = v.pg_name || '\u2014';
+          $node.querySelector('[data-f="withoutPcs"]').textContent = pcsLabel(v.without_pcs);
           $rows.appendChild($node);
         });
+        requestAnimationFrame(syncAutoScroll);
       }
 
       function showError(msg) {

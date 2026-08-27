@@ -21,6 +21,7 @@ Remove-Item -Recurse -Force build, dist -ErrorAction SilentlyContinue
   --name GateWatch `
   --windowed `
   --noconfirm `
+  --noupx `
   --add-data "ui;ui" `
   --collect-all mysql.connector `
   app.py

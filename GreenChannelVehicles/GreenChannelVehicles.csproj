@@ -138,6 +138,7 @@
     <Content Include="About.aspx" />
     <Content Include="Buyer.aspx" />
     <Content Include="Security.aspx" />
+    <Content Include="GateWatch.aspx" />
     <Content Include="Content\gcv.css" />
     <Content Include="Scripts\buyer.js" />
     <Content Include="Scripts\security.js" />
@@ -241,6 +242,13 @@
     </Compile>
     <Compile Include="Security.aspx.designer.cs">
       <DependentUpon>Security.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GateWatch.aspx.cs">
+      <DependentUpon>GateWatch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GateWatch.aspx.designer.cs">
+      <DependentUpon>GateWatch.aspx</DependentUpon>
     </Compile>
     <Compile Include="About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>

@@ -5,18 +5,13 @@ import os
 import mysql.connector
 import websockets
 
-import config
-
-DB_HOST = os.environ.get("GCV_DB_HOST", config.DB_HOST)
-DB_NAME = os.environ.get("GCV_DB_NAME", config.DB_NAME)
-DB_USER = os.environ.get("GCV_DB_USER", config.DB_USER)
-DB_PASSWORD = os.environ.get("GCV_DB_PASSWORD", config.DB_PASSWORD)
+DB_HOST = os.environ.get("GCV_DB_HOST", "mazpngpappmysql01.mysql.database.azure.com")
+DB_NAME = os.environ.get("GCV_DB_NAME", "gcv_db")
+DB_USER = os.environ.get("GCV_DB_USER", "ngpdbadm")
+DB_PASSWORD = os.environ.get("GCV_DB_PASSWORD", "%%89evqezbJB")
 WS_HOST = "127.0.0.1"
-WS_PORT = int(os.environ.get("GCV_KIOSK_WS_PORT", config.KIOSK_WS_PORT))
+WS_PORT = int(os.environ.get("GCV_KIOSK_WS_PORT", 8765))
 POLL_SECONDS = 3
-
-if not DB_PASSWORD or DB_PASSWORD == "REPLACE_ME":
-    raise SystemExit("kiosk/config.py has no DB_PASSWORD set. Copy config.example.py to config.py and fill it in.")
 
 clients = set()
 last_payload = None
@@ -25,13 +20,16 @@ last_payload = None
 def fetch_pending():
     conn = mysql.connector.connect(
         host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD,
+        ssl_disabled=True, connection_timeout=10,
     )
     try:
         cur = conn.cursor(dictionary=True)
         cur.execute(
-            "SELECT id, vehicle_no, transporter, material FROM vehicle_entries "
-            "WHERE is_inside = 0 AND DATE(submitted_at) = CURDATE() "
-            "ORDER BY submitted_at DESC"
+            "SELECT ve.id, ve.vehicle_no, ve.transporter, ve.without_pcs, pg.PG_Name AS pg_name "
+            "FROM vehicle_entries ve "
+            "LEFT JOIN plant_master.tbl_PG pg ON pg.PG_ID = ve.pg_id "
+            "WHERE ve.is_inside = 0 AND DATE(ve.submitted_at) = CURDATE() "
+            "ORDER BY ve.submitted_at DESC"
         )
         rows = cur.fetchall()
         cur.close()
